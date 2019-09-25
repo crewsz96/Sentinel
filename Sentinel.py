@@ -7,10 +7,15 @@ import asyncio
 import datetime, time
 
 with open('config.json') as f:
-    data = json.load(f)
+    config = json.load(f)
+    f.close()
 
-TOKEN = data["token"]
-BOT_PREFIX = data["prefix"]
+with open('intro.json') as f_data:
+     intro = json.load(f_data)
+     f_data.close()
+
+TOKEN = config["token"]
+BOT_PREFIX = config["prefix"]
 
 bot = commands.Bot(command_prefix=BOT_PREFIX)
 start_time = time.time()
@@ -27,7 +32,7 @@ async def on_ready():
 #--------------------------------------------#
 async def status_task():
 
-    status_messages = data["status_messages"]
+    status_messages = config["status_messages"]
 
     while True:
 
@@ -72,7 +77,7 @@ async def addrole(ctx):
     if ctx.channel.name != 'role-requests':
         return
 
-    valid_roles = data["valid_roles"]
+    valid_roles = config["valid_roles"]
     msg = ctx.message
     entered_role = ctx.message.content.split(' ', 1)[1]
     member = ctx.author
@@ -88,7 +93,6 @@ async def addrole(ctx):
     await msg.delete()
     await bot_msg.delete()
 #----------------------------------------------#
-
 @bot.command(name='removerole',
             aliases=['Removerole', 'RemoveRole', 'removeRole','Rm', 'rm', 'rM', 'remove'])
 async def removerole(ctx):
@@ -111,6 +115,72 @@ async def removerole(ctx):
     await asyncio.sleep(10)
     await msg.delete()
     await bot_msg.delete()
+
+#----------------------------------------------#
+@bot.command(name='itbelikethat',
+            aliases=['belike','itbe'])
+async def itbelikethat(ctx):
+
+    await ctx.send(file=discord.File('itbelikethat.mp4'))
+
+#----------------------------------------------#
+@bot.command(name='jp')
+async def jp(ctx):
+
+    await ctx.send(file=discord.File('jp.jpg'))
+
+#----------------------------------------------#
+@bot.command(name='divide')
+async def divide(ctx):
+
+    char = ctx.message.content.split(' ', 1)[1]
+
+    text = {}
+    for obj in intro:
+        if obj['Character'].upper() == char.upper():
+            text = obj
+            break
+
+    if text == {}:
+        await ctx.send("That character doesn't exist.")
+    else:
+        msg = text['Intro']
+        await ctx.send('**{0}**\n`{1}`'.format(char, msg))
+
+
+#----------------------------------------------#
+# Greets members when they join the server.
+@bot.event
+async def on_member_join(member):
+
+    channel = member.guild.get_channel(569976242028150832)
+
+    await channel.send('Hello ' + member.mention + '! Please take a moment to look at ' + member.guild.get_channel(618960796743106580).mention + '.')
+#----------------------------------------------#
+@bot.command(name='piano',
+            aliases=['giogio','GioGio', 'Giorno', 'giorno'])
+async def piano(ctx):
+
+    await ctx.send(file=discord.File('345.mp4'))
+#----------------------------------------------#
+# @bot.command(name='momma',
+#             aliases=['moms', "mom", "ma"])
+# async def momma(ctx):
+#
+#     member = ctx.author.nick
+#     await ctx.send('{0}'.format(member))
+#
+#     try: # If the goon exists
+#
+#         tmp = data[member]
+#         data[member] = str(int(data[member], 10))
+#         f_data
+#         f_data.dump(data)
+#
+#     except (KeyError, AttributeError): # If we need to create a new goon
+#         await ctx.send("Error")
+#
+#     await ctx.send('Momma count for {0.mention} is {1}'.format(member, tmp))
 
 
 #----------------------------------------------#
